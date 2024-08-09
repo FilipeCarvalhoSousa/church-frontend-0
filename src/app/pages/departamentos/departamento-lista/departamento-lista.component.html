@@ -1,0 +1,31 @@
+<div style="padding: 2%;">
+  <table mat-table [dataSource]="departamentoList" class="mat-elevation-z8">
+    <ng-container matColumnDef="nome">
+      <th mat-header-cell *matHeaderCellDef> Nome </th>
+      <td mat-cell *matCellDef="let departamento"> {{departamento.nome}} </td>
+    </ng-container>
+    <ng-container matColumnDef="descricao">
+      <th mat-header-cell *matHeaderCellDef> Descricao </th>
+      <td mat-cell *matCellDef="let departamento"> {{departamento.descricao}} </td>
+    </ng-container>
+    <ng-container matColumnDef="action">
+      <th mat-header-cell *matHeaderCellDef style="text-align: center;"> Ações </th>
+      <td mat-cell *matCellDef="let departamento" style="text-align: center;">
+        <button class="button-warn" mat-fab (click)="deleteDepartamento(departamento.id)">
+          <mat-icon>delete</mat-icon>
+        </button>
+        <button class="button-alert" mat-fab (click)="editarDepartamento(departamento.id)">
+          <mat-icon>edit</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="colunasDepartamento"></tr>
+    <tr mat-row *matRowDef="let row; columns: colunasDepartamento;"></tr>
+  </table>
+  <div style="margin: 1%; text-align: right;">
+    <button mat-fab extended class="button-primary" (click)="incluirDepartamento()">
+      <mat-icon>people</mat-icon>
+      <span>Novo Membro</span>
+    </button>
+  </div>
+</div>

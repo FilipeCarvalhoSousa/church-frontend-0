@@ -1,0 +1,95 @@
+/* Base Styles */
+
+
+/* Header Container */
+.header-container {
+  display: flex; /* Arrange elements horizontally */
+  justify-content: space-between; /* Distribute space evenly */
+  align-items: center; /* Align items vertically */
+  max-width: 1200px; /* Limit width for larger screens */
+  margin: 0 auto; /* Center the container horizontally */
+}
+
+.container-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  background-color: #2A0E71; /* Light background color */
+  color: #ffffff; /* Dark text color for contrast */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  width: 100%; /* Stretch to full width */
+}
+
+/* Logo */
+.logo {
+  display: inline-block; /* Allow text wrapping around the logo */
+  width: auto;
+  height: 70px;
+  padding-top: 10px;
+}
+
+/* Navigation Menu */
+.nav-menu {
+  display: flex; /* Arrange menu items horizontally */
+  list-style: none; /* Remove default list bullets */
+  padding: 0; /* Reset default padding */
+  margin: 0; /* Reset default margin */
+}
+
+.nav-menu li {
+  margin-right: 20px; /* Space between menu items */
+}
+
+
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .header-container {
+    flex-direction: column; /* Stack elements vertically on smaller screens */
+    align-items: flex-start; /* Align items to the left */
+  }
+
+  .nav-menu {
+    flex-direction: column; /* Stack menu items vertically */
+    margin-top: 10px; /* Add some space between the logo and menu */
+  }
+
+  .nav-menu li {
+    margin: 5px 0; /* Reduce spacing between items */
+  }
+}
+
+.example-spacer {
+  flex: 1 1 auto;
+}
+
+.container {
+  background-color: #ffffff; /* Light background color */
+  color: #2A0E71; /* Dark text color for contrast */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  width: 100%; /* Stretch to full width */
+}
+
+.custom-login-button {
+  background-color: white;
+  color: #2A0E71;
+}
+
+.title {
+  color: #2A0E71;
+  text-decoration: none !important;
+  align-content: center;
+  margin-left: 5px;
+
+  .nav-menu a {
+    display: inline-block;
+    color: #333; /* Text color */
+    text-decoration: none; /* Remove default underline */
+    font-weight: bold; /* Make links stand out */
+    padding: 8px 12px; /* Add some padding for visual comfort */
+  }
+
+  .nav-menu a:hover {
+    background-color: #f2f2f2; /* Subtle hover effect */
+  }
+}
