@@ -1,0 +1,56 @@
+@import 'src/styles.scss';
+
+/* member-form.component.css */
+/* mat-card {
+  max-width: 600px;
+  margin: 20px auto;
+}
+
+mat-form-field {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+mat-card-actions {
+  display: flex;
+  justify-content: flex-end;
+} */
+.actions {
+  padding-top: 5px;
+}
+
+.titulo-cadastro {
+  font-family: 'Abadi', Geneva, Verdana, sans-serif;
+}
+
+.tabela-auxiliar {
+  width: 50%;
+}
+.tabela-filhos {
+  display: block;
+  align-items: center;
+  border: 1px solid #ccc; /* Apenas para visualização */
+  padding: 10px;
+  width: 300px; /* Ajuste o valor conforme necessário */
+
+  .tabela-coluna-filhos {
+    width: 100px;
+  }
+}
+mat-table {
+  max-width: 300px; /* Ajuste o valor conforme necessário */
+  margin: 100px;
+}
+
+.mat-column-nome { /* Substitua 'nome' pelo nome da sua coluna */
+  width: 200px;
+}
+.mat-column-telefone { /* Substitua 'nome' pelo nome da sua coluna */
+  width: 100px;
+}
+.mat-column-email { /* Substitua 'nome' pelo nome da sua coluna */
+  width: 300px;
+}
+.mat-column-acao { /* Substitua 'nome' pelo nome da sua coluna */
+  width: 50px;
+}

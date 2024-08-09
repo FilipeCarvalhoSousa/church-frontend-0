@@ -1,0 +1,32 @@
+<div style="padding: 2%;" *ngIf="!isEditar">
+  <table mat-table [dataSource]="membros" class="mat-elevation-z8">
+    <ng-container matColumnDef="nome">
+      <th mat-header-cell *matHeaderCellDef> Nome </th>
+      <td mat-cell *matCellDef="let membro"> {{membro.nome}} </td>
+    </ng-container>
+    <ng-container matColumnDef="conjuge">
+      <th mat-header-cell *matHeaderCellDef> Conjuge </th>
+      <td mat-cell *matCellDef="let membro"> {{membro.conjuge.nome}} </td>
+    </ng-container>
+    <ng-container matColumnDef="action">
+      <th mat-header-cell *matHeaderCellDef style="text-align: center;"> Ações </th>
+      <td mat-cell *matCellDef="let membro" style="text-align: center;">
+        <button class="button-warn" mat-fab (click)="deleteMembro(membro.id)">
+          <mat-icon>delete</mat-icon>
+        </button>
+        <button class="button-alert" mat-fab (click)="editarMembro(membro.id)">
+          <mat-icon>edit</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+  <div style="margin: 1%; text-align: right;">
+    <button mat-fab extended class="button-primary" (click)="incluirMembro()">
+      <mat-icon>people</mat-icon>
+      <span>Novo Membro</span>
+    </button>
+  </div>
+</div>
+
