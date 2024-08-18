@@ -1,4 +1,4 @@
-import { ActivatedRoute, Route } from '@angular/router';
+import { ActivatedRoute, Route, Router } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
 import { DepartamentoService } from 'src/app/service/departamento.service';
 
@@ -13,12 +13,12 @@ export class DepartamentoListaComponent implements OnInit {
 
   constructor(
     private departamentoService: DepartamentoService,
-    private router: ActivatedRoute) {}
+    private route: ActivatedRoute,
+    private router: Router) {}
 
     getAllDepartamentos() {
-      this.departamentoService.GetAllDepartamentos().subscribe({
+      this.departamentoService.getAllDepartamentos().subscribe({
         next: (response: any[]) => {
-          console.log('res', response);
           this.departamentoList = response;
         },
         error: (err) => {
@@ -49,7 +49,7 @@ export class DepartamentoListaComponent implements OnInit {
     }
 
     incluirDepartamento() {
-      console.log('Incluir');
+      this.router.navigate(['departamento/add']);
     }
 
     ngOnInit( ):void {

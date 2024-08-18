@@ -1,13 +1,11 @@
 .panel {
-  height: 50px;
+  height: 420px;
 
   .panel-btn {
     display: flex;
     align-items: center;
     padding: 4px;
     margin-bottom: 16px;
-    border: 1px solid #adadad;
-    border-radius: 8px;
     cursor: pointer;
     height: 80px;
 
@@ -30,6 +28,19 @@
   flex: 1 1 auto;
 }
 
-.container {
+.contain {
   padding: 20px;
+}
+
+.custom-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #2A0E71;
+}
+
+.p-conteudo {
+  display: grid;
+  place-items: center;
+  width: 50%;
+  margin: 0 auto;
 }
