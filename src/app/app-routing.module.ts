@@ -4,6 +4,7 @@ import { HomeComponent } from './home/home.component';
 import { MembroListComponent } from './pages/membros/membro-list/membro-list.component';
 import { MembroEdicaoComponent } from './pages/membros/membro-edicao/membro-edicao.component';
 import { DepartamentoListaComponent } from './pages/departamentos/departamento-lista/departamento-lista.component';
+import { DepartamentoEdicaoComponent } from './pages/departamentos/departamento-edicao/departamento-edicao.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -23,6 +24,14 @@ const routes: Routes = [
   {
     path: 'departamento',
     component: DepartamentoListaComponent
+  },
+  {
+    path: 'departamento/add',
+    component: DepartamentoEdicaoComponent
+  },
+  {
+    path: 'departamento/edit/:id',
+    component: DepartamentoEdicaoComponent
   },
 ];
 
