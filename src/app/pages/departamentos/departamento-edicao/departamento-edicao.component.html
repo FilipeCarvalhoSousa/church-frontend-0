@@ -1,1 +1,76 @@
-<p>departamento-edicao works!</p>
+<div>
+  <form [formGroup]="departamentoForm">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title *ngIf="departamentoId" class="titulo">Alterar Departamento</mat-card-title>
+        <mat-card-title *ngIf="!departamentoId" class="titulo">Cadastrar Departamento</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="departamento-details">
+
+          <mat-form-field>
+            <mat-label>Nome</mat-label>
+            <input matInput formControlName="nome" type="text">
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Descricao</mat-label>
+            <input matInput formControlName="descricao" type="text">
+          </mat-form-field>
+        </div>
+
+        <div class="departamento-details">
+          <p>Cargos</p>
+
+          <mat-form-field>
+            <mat-label>Título</mat-label>
+            <input matInput formControlName="cargo_titulo" type="text">
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Descricao</mat-label>
+            <input matInput formControlName="cargo_descricao" type="text">
+          </mat-form-field>
+        </div>
+
+        <div class="tabela-auxiliar" *ngIf="cargosDepartamentoList.length">
+          <h3 class="sub-titulo">Departamentos Incluídos</h3>
+          <table mat-table [dataSource]="cargosDepartamentoList" class="mat-elevation-z1">
+            <ng-container class="tabela-coluna-filhos" matColumnDef="titulo">
+              <th mat-header-cell *matHeaderCellDef> titulo </th>
+              <td mat-cell *matCellDef="let cargo"> {{cargo.titulo}} </td>
+            </ng-container>
+            <ng-container matColumnDef="acao">
+              <th mat-header-cell *matHeaderCellDef> Excluir </th>
+              <td mat-cell *matCellDef="let cargo">
+                <button mat-icon-button color="warn" (click)="removerCargo(cargo)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="colunasExibicaoCargos"></tr>
+            <tr mat-row *matRowDef="let row; columns: colunasExibicaoCargos;"></tr>
+          </table>
+        </div>
+
+        <div>
+          <div class="tabela-auxiliar" style *ngIf="membrosDepartamentoList.length">
+            <h3 class="sub-titulo">Fihos Incluídos</h3>
+            <table mat-table [dataSource]="membrosDepartamentoList">
+              <ng-container matColumnDef="nome">
+                <th mat-header-cell *matHeaderCellDef> Nome </th>
+                <td mat-cell *matCellDef="let membro"> {{membro.nome}} </td>
+              </ng-container>
+              <tr mat-header-row *matHeaderRowDef="colunasExibicaoMembros"></tr>
+              <tr mat-row *matRowDef="let row; columns: colunasExibicaoMembros;"></tr>
+            </table>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="button-primary" mat-raised-button type="submit" (click)="onSubmit()">Salvar</button>
+          <button class="button-secondary" mat-raised-button type="button" (click)="onCancel()">Cancelar</button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </form>
+</div>

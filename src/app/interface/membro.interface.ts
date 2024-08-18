@@ -7,7 +7,7 @@ export interface Membro {
   endereco: Endereco;
   data_nascimento: string;
   departamento: {
-    titulo: string;
+    nome: string;
   }[];
   cargo: {
     titulo: string;

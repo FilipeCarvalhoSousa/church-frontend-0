@@ -30,7 +30,6 @@ import { HomeComponent } from './home/home.component';
 import { MembroDetalheComponent } from './pages/membros/membro-detalhe/membro-detalhe.component';
 import { MembroEdicaoComponent } from './pages/membros/membro-edicao/membro-edicao.component';
 import { MembroListComponent } from './pages/membros/membro-list/membro-list.component';
-import { MembroPanelComponent } from './pages/membros/membro-panel/membro-panel.component';
 import { DepartamentoListaComponent } from './pages/departamentos/departamento-lista/departamento-lista.component';
 import { DepartamentoEdicaoComponent } from './pages/departamentos/departamento-edicao/departamento-edicao.component';
 
@@ -45,7 +44,6 @@ import { DepartamentoEdicaoComponent } from './pages/departamentos/departamento-
     MembroDetalheComponent,
     MenuBarComponent,
     MembroListComponent,
-    MembroPanelComponent,
     DepartamentoListaComponent,
     DepartamentoEdicaoComponent,
   ],

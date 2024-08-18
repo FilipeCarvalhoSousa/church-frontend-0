@@ -2,7 +2,9 @@ import { MembrosService } from './../../../service/membros.service';
 import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Departamento } from 'src/app/interface/departamento.interface';
 import { Membro } from 'src/app/interface/membro.interface';
+import { DepartamentoService } from 'src/app/service/departamento.service';
 import { UF } from 'src/app/shared/helpers/estados';
 import { ESTADO_CIVIL, SITUACAO } from 'src/app/shared/helpers/shared';
 
@@ -16,6 +18,7 @@ export class MembroEdicaoComponent implements OnInit {
   membro!: Membro;
   conjugeList!: Membro[];
   estadosList: any[] = UF;
+  listaDeDepartamentos!: Departamento[]
   departamentoItemList: any[] = [];
   departamentoList: any[] = [
     {
@@ -211,6 +214,7 @@ export class MembroEdicaoComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private membroService: MembrosService,
+    private departamentoService: DepartamentoService,
     private cdr: ChangeDetectorRef
   ) { }
 
@@ -374,8 +378,8 @@ export class MembroEdicaoComponent implements OnInit {
         this.endereco_cidade.setValue(response.endereco.cidade);
         this.endereco_estado.setValue(response.endereco.estado);
         this.endereco_pais.setValue(response.endereco.país);
-        // this.departamento.setValue(response.departamento);
-        // this.cargo.setValue(response.cargo);
+        this.departamentoList = response.departamento;
+        this.cargo.setValue(response.cargo);
         this.data_nascimento.setValue(response.data_nascimento);
         this.estado_civil.setValue(response.estado_civil);
         this.conjuge.setValue(response.conjuge.id);
@@ -404,8 +408,23 @@ export class MembroEdicaoComponent implements OnInit {
     })
   }
 
+  getAllDepartamentos() {
+    this.departamentoService.getAllDepartamentos().subscribe({
+      next: (response) => {
+        this.listaDeDepartamentos = response;
+      },
+      error(err) {
+
+      },
+      complete() {
+
+      },
+    })
+  }
+
   ngOnInit(): void {
     this.getAllMembros();
+    this.getAllDepartamentos();
     const id = this.route.snapshot.paramMap.get('id');
     this.memberId = id ? +id : null;
     if (this.memberId) {
