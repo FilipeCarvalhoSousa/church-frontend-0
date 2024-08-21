@@ -3,7 +3,7 @@ export interface Departamento {
   nome: string;
   descricao: string;
   membros: MembroDepartamento[]
-  cargo: CargoDepartamento[];
+  cargos: CargoDepartamento[];
 };
 
 export interface MembroDepartamento {

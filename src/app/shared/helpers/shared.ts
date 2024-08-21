@@ -34,3 +34,13 @@ export const SITUACAO = [{
   value: 'Inativo'
 }]
 
+export const SEXO = [
+  {
+    id: 1,
+    value: 'Masculino'
+  },
+  {
+    id: 2,
+    value: 'Feminino'
+  },
+]

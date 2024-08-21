@@ -4,6 +4,7 @@ export interface Membro {
   situacao: number;
   email: string;
   telefone: string;
+  sexo: number;
   endereco: Endereco;
   data_nascimento: string;
   departamento: {
@@ -14,9 +15,9 @@ export interface Membro {
     departamento: string;
   }[];
   estado_civil: string;
-  conjuge: Relative;
+  conjuge: conjuge;
   data_casamento: string;
-  filhos: Relative[];
+  filhos: Filhos[];
 }
 
 export interface Endereco {
@@ -30,6 +31,14 @@ export interface Endereco {
 export interface Relative {
   id: number;
   nome: string;
-  telefone: number;
-  email: string;
+}
+
+export interface conjuge {
+  id: number;
+  nome: string;
+}
+
+export interface Filhos {
+  id: number;
+  nome: string;
 }

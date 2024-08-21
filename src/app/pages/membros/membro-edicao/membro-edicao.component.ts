@@ -2,11 +2,11 @@ import { MembrosService } from './../../../service/membros.service';
 import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Departamento } from 'src/app/interface/departamento.interface';
+import { CargoDepartamento, Departamento } from 'src/app/interface/departamento.interface';
 import { Membro } from 'src/app/interface/membro.interface';
 import { DepartamentoService } from 'src/app/service/departamento.service';
 import { UF } from 'src/app/shared/helpers/estados';
-import { ESTADO_CIVIL, SITUACAO } from 'src/app/shared/helpers/shared';
+import { ESTADO_CIVIL, SEXO, SITUACAO } from 'src/app/shared/helpers/shared';
 
 @Component({
   selector: 'app-membro-edicao',
@@ -14,74 +14,26 @@ import { ESTADO_CIVIL, SITUACAO } from 'src/app/shared/helpers/shared';
   styleUrls: ['./membro-edicao.component.scss']
 })
 export class MembroEdicaoComponent implements OnInit {
-  @Input()
-  membro!: Membro;
-  conjugeList!: Membro[];
+  conjugesFiltrados: Membro[] = [];
+  selectedSexo: number | null = null;
+  selectedConjugeId: number | null = null;
+
+  conjugeList: Membro[] = [];
   estadosList: any[] = UF;
-  listaDeDepartamentos!: Departamento[]
+  sexoList: any[] = SEXO;
+  listaDepartamentos: Departamento[] = [];
+  listaCargos: CargoDepartamento[] = [];
   departamentoItemList: any[] = [];
-  departamentoList: any[] = [
-    {
-      id: 1,
-      nome: 'Diretoria',
-      cargo: [
-        {
-          id: 1,
-          titulo: 'Presidente'
-        },
-        {
-          id: 2,
-          titulo: 'Tesoureiro'
-        },
-        {
-          id: 3,
-          titulo: 'Secretário'
-        }
-      ]
-    },
-    {
-      id: 2,
-      nome: 'Jovens',
-      cargo: [
-        {
-          id: 1,
-          titulo: 'Presidente'
-        },
-        {
-          id: 2,
-          titulo: 'Tesoureiro'
-        },
-        {
-          id: 3,
-          titulo: 'Secretário'
-        }
-      ]
-    },
-    {
-      id: 3,
-      nome: 'Casais',
-      cargo: [
-        {
-          id: 1,
-          titulo: 'Presidente'
-        },
-        {
-          id: 2,
-          titulo: 'Tesoureiro'
-        },
-        {
-          id: 3,
-          titulo: 'Secretário'
-        }
-      ]
-    },
-  ];
+  cargosFiltrados: any[] = [];
+  departamentoSelecionado!: any;
 
   cargoList!: any[];
+  cargoListDepartamento!: any[];
   filhosList: any[] = [];
   filhosItemList!: any[];
 
   memberId: number | null = null;
+  isEditing: boolean = false;
 
   membroForm: FormGroup = new FormGroup({
     id: new FormControl('', { validators: [] }),
@@ -89,14 +41,14 @@ export class MembroEdicaoComponent implements OnInit {
     situacao: new FormControl('', Validators.required),
     email: new FormControl('', [Validators.required, Validators.email]),
     telefone: new FormControl('', Validators.required),
+    sexo: new FormControl('', Validators.required),
     endereco_rua: new FormControl('', Validators.required),
     endereco_bairro: new FormControl('', Validators.required),
     endereco_cidade: new FormControl('', Validators.required),
     endereco_estado: new FormControl('', Validators.required),
     endereco_pais: new FormControl('', Validators.required),
-    departamento_nome: new FormControl('', Validators.required),
-    cargo_titulo: new FormControl('', Validators.required),
-    cargo_departamento: new FormControl('', Validators.required),
+    departamento: new FormControl('', { validators: [] }),
+    cargo: new FormControl('', Validators.required),
     data_nascimento: new FormControl('', Validators.required),
     estado_civil: new FormControl('', Validators.required),
     conjuge: new FormControl('', Validators.required),
@@ -121,6 +73,11 @@ export class MembroEdicaoComponent implements OnInit {
   get situacao(): FormControl {
     return this.membroForm.get(
       'situacao'
+    ) as FormControl;
+  }
+  get sexo(): FormControl {
+    return this.membroForm.get(
+      'sexo'
     ) as FormControl;
   }
   get email(): FormControl {
@@ -158,9 +115,9 @@ export class MembroEdicaoComponent implements OnInit {
       'endereco_pais'
     ) as FormControl;
   }
-  get departamento_nome(): FormControl {
+  get departamento(): FormControl {
     return this.membroForm.get(
-      'departamento_nome'
+      'departamento'
     ) as FormControl;
   }
   get cargo(): FormControl {
@@ -208,70 +165,70 @@ export class MembroEdicaoComponent implements OnInit {
   estadoCivil = ESTADO_CIVIL;
 
   colunasExibicaoFilhos: string[] = ['nome', 'telefone', 'email', 'acao'];
-  colunasExibicaoDepartamentos: string[] = ['nome', 'acao'];
+  colunasExibicaoDepartamentos: string[] = ['nome', 'cargos','acao'];
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private membroService: MembrosService,
     private departamentoService: DepartamentoService,
-    private cdr: ChangeDetectorRef
   ) { }
-
-  onSubmit() {
-    if(this.id.value) {
-      this.editarMembro();
-    } else {
-      this.createMembro();
-    }
-  }
 
   createMembro() {
     const dados = this.montarDadosSId();
     this.membroService.criarMembro(dados).subscribe({
       next: (response: Membro) => {
-        console.log('res-create', response);
+        this.router.navigate(['membros/']);
       },
       error: (error) => {
         console.log('erro criação', error);
       },
-      complete: () => {}
+      complete: () => { }
     })
   }
 
   editarMembro() {
     const data = this.montarDados();
+
     this.membroService.editarMembro(this.id.value, data).subscribe({
-      next: (response: any) => {
-        console.log('editar', response);
+      next: (response: Membro) => {
+        this.router.navigate(['membros/']);
       },
       error: (erro) => {
         console.log('erro editar', erro);
       },
-      complete: () => {}
+      complete: () => { }
     })
   }
 
   resetDepartamento() {
-    this.departamento_nome.setValue('');
+    this.departamento.setValue('');
   }
 
-  adicionarDepartamento(){
-    const departamento = this.departamento_nome.value;
+  adicionarDepartamento(depart: number) {
+    const departamento = this.departamentoSelecionado = this.listaDepartamentos.find(d => d.id === depart);
+
     if (!departamento) {
       return
     }
+    console.log('d.', departamento);
+
 
     const data = {
-      nome: departamento,
+      nome: departamento.nome,
+      cargos: this.cargo.value
     }
 
+    this.cargoListDepartamento = data.cargos
+
     this.departamentoItemList = [...this.departamentoItemList, data]
+    console.log('this.departamentoItemList', this.departamentoItemList);
+
 
     this.resetDepartamento()
   }
 
-  removerDepartamento(departamento: any){
+  removerDepartamento(departamento: any) {
     this.departamentoItemList = this.departamentoItemList.filter(d => d !== departamento);
   }
 
@@ -281,7 +238,7 @@ export class MembroEdicaoComponent implements OnInit {
     this.filho_email.setValue('');
   }
 
-  adicionarFilho(){
+  adicionarFilho() {
     const data = {
       nome: this.filho_nome.value,
       telefone: this.filho_telefone.value,
@@ -291,11 +248,11 @@ export class MembroEdicaoComponent implements OnInit {
     this.resetFilhos()
   }
 
-  removerFilho(filho: any){
+  removerFilho(filho: any) {
     this.filhosList = this.filhosList.filter(f => f !== filho);
   }
 
-  editarFilho(index: number){
+  editarFilho(index: number) {
     const data = this.filhosList[index]
     this.filho_nome.setValue(data.nome)
     this.filho_telefone.setValue(data.telefone)
@@ -303,10 +260,11 @@ export class MembroEdicaoComponent implements OnInit {
   }
 
   montarDados() {
-    const dadosMembros: Membro = {
+    const dadosMembros: any = {
       id: this.id.value,
       nome: this.nome.value,
       situacao: this.situacao.value,
+      sexo: this.sexo.value,
       email: this.email.value,
       telefone: this.telefone.value,
       estado_civil: this.estado_civil.value,
@@ -317,16 +275,11 @@ export class MembroEdicaoComponent implements OnInit {
         bairro: this.endereco_bairro.value,
         cidade: this.endereco_cidade.value,
         estado: this.endereco_estado.value,
-        país: this.endereco_pais.value,
+        país: 'Brasil',
       },
       departamento: this.departamentoItemList,
       cargo: this.cargoList,
-      conjuge: {
-        id: this.conjuge.value,
-        nome: '',
-        telefone: 0,
-        email: ''
-      },
+      conjugeId: this.conjuge.value,
       filhos: this.filhosList
     }
     return dadosMembros
@@ -336,6 +289,7 @@ export class MembroEdicaoComponent implements OnInit {
     const dadosMembros: any = {
       nome: this.nome.value,
       situacao: this.situacao.value,
+      sexo: this.sexo.value,
       email: this.email.value,
       telefone: this.telefone.value,
       estado_civil: this.estado_civil.value,
@@ -350,12 +304,7 @@ export class MembroEdicaoComponent implements OnInit {
       },
       departamento: [],
       cargo: [],
-      conjuge: {
-        id: this.conjuge.value,
-        nome: '',
-        telefone: 0,
-        email: ''
-      },
+      conjugeId: this.conjuge.value ? this.conjuge.value : null,
       filhos: []
     }
     return dadosMembros
@@ -368,22 +317,37 @@ export class MembroEdicaoComponent implements OnInit {
   getMembroPorId(id: number) {
     this.membroService.getMembroById(id).subscribe({
       next: (response: Membro) => {
-        this.id.setValue(response.id);
-        this.nome.setValue(response.nome);
-        this.situacao.setValue(response.situacao);
-        this.email.setValue(response.email);
-        this.telefone.setValue(response.telefone);
-        this.endereco_rua.setValue(response.endereco.rua);
-        this.endereco_bairro.setValue(response.endereco.bairro);
-        this.endereco_cidade.setValue(response.endereco.cidade);
-        this.endereco_estado.setValue(response.endereco.estado);
-        this.endereco_pais.setValue(response.endereco.país);
-        this.departamentoList = response.departamento;
-        this.cargo.setValue(response.cargo);
-        this.data_nascimento.setValue(response.data_nascimento);
-        this.estado_civil.setValue(response.estado_civil);
-        this.conjuge.setValue(response.conjuge.id);
-        this.data_casamento.setValue(response.data_casamento);
+        console.log('response', response);
+        this.membroForm.patchValue({
+          id: response.id,
+          nome: response.nome,
+          situacao: response.situacao,
+          sexo: response.sexo,
+          email: response.email,
+          telefone: response.telefone,
+          endereco_rua: response.endereco.rua,
+          endereco_bairro: response.endereco.bairro,
+          endereco_cidade: response.endereco.cidade,
+          endereco_estado: response.endereco.estado,
+          endereco_pais: response.endereco.país,
+          data_nascimento: response.data_nascimento,
+          estado_civil: response.estado_civil,
+          data_casamento: response.data_casamento,
+          conjuge: response.conjuge ? response.conjuge.id : null,
+        });
+
+        this.departamentoItemList = response.departamento;
+        this.cargoList = response.cargo;
+        this.filhosList = response.filhos;
+
+        this.selectedSexo = response.sexo; // Define o sexo selecionado
+        this.filtrarConjuges();
+        console.log('this.departamentoItemList', this.departamentoItemList);
+        console.log('this.cargoList', this.cargoList);
+        console.log('this.filhos', this.filhosList);
+
+
+
 
         this.membroForm.get('estado_civil')?.valueChanges.subscribe(value => {
           if (value !== 2) {
@@ -410,8 +374,8 @@ export class MembroEdicaoComponent implements OnInit {
 
   getAllDepartamentos() {
     this.departamentoService.getAllDepartamentos().subscribe({
-      next: (response) => {
-        this.listaDeDepartamentos = response;
+      next: (response: Departamento[]) => {
+        this.listaDepartamentos = response;
       },
       error(err) {
 
@@ -422,6 +386,32 @@ export class MembroEdicaoComponent implements OnInit {
     })
   }
 
+  onDepartamentoChange(value: number) {
+    this.departamentoSelecionado = this.listaDepartamentos.find(d => d.id === value);
+
+    this.cargosFiltrados = this.departamentoSelecionado ? this.departamentoSelecionado.cargos : [];
+  }
+  onSexoChange(sexo: number) {
+    if (this.isEditing) {
+      this.selectedSexo = sexo;
+      this.filtrarConjuges();
+    }
+    this.selectedSexo = sexo;
+    this.filtrarConjuges();
+  }
+
+  filtrarConjuges() {
+    if (this.selectedSexo === 1) {
+      // Se o sexo selecionado for masculino, filtra membros femininos
+      this.conjugesFiltrados = this.conjugeList.filter(m => m.sexo === 2 && m.id !== this.id.value);
+    } else if (this.selectedSexo === 2) {
+      // Se o sexo selecionado for feminino, filtra membros masculinos
+      this.conjugesFiltrados = this.conjugeList.filter(m => m.sexo === 1 && m.id !== this.id.value);
+    } else {
+      this.conjugesFiltrados = [];
+    }
+  }
+
   ngOnInit(): void {
     this.getAllMembros();
     this.getAllDepartamentos();
@@ -429,6 +419,7 @@ export class MembroEdicaoComponent implements OnInit {
     this.memberId = id ? +id : null;
     if (this.memberId) {
       this.getMembroPorId(this.memberId)
+      this.isEditing = true;
     }
     this.membroForm.get('estado_civil')?.valueChanges.subscribe(value => {
       if (value !== 2) {
@@ -439,6 +430,5 @@ export class MembroEdicaoComponent implements OnInit {
         this.data_casamento.enable();
       }
     });
-
   }
 }

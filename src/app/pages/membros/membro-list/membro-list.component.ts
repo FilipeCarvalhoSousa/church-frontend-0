@@ -1,4 +1,6 @@
-import { Component, OnInit, Output } from '@angular/core';
+import { Component, OnInit, Output, ViewChild } from '@angular/core';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Membro } from 'src/app/interface/membro.interface';
 import { MembrosService } from 'src/app/service/membros.service';
@@ -9,14 +11,18 @@ import { MembrosService } from 'src/app/service/membros.service';
   styleUrls: ['./membro-list.component.scss']
 })
 export class MembroListComponent implements OnInit {
-  membros!: Membro[];
+  membros: Membro[] = [];
+  dataSource = new MatTableDataSource<Membro>([]);
   membro!: Membro;
   membresia!: Membro[];
   alert: boolean = false;
   isEditar: boolean = false;
   idMembro!: number;
   message: string = '';
-  displayedColumns: string[] = ['nome', 'conjuge', 'action'];
+  displayedColumns: string[] = ['nome', 'conjuge', 'sexo', 'action'];
+
+  @ViewChild(MatSort)
+  sort!: MatSort;
 
   @Output()
   edicao!: boolean
@@ -26,7 +32,8 @@ export class MembroListComponent implements OnInit {
   getAllMembros() {
     this.membrosService.getAllMembros().subscribe({
       next: (response: Membro[]) => {
-        this.membros = response
+        this.dataSource.data = response;
+        this.dataSource.sort = this.sort;
       },
       error: () => { },
       complete: () => { },
@@ -59,6 +66,15 @@ export class MembroListComponent implements OnInit {
       error: () => { },
       complete: () => { },
     })
+  }
+
+  applyFilter(sexo: number) {
+    this.dataSource.filterPredicate = (data: Membro, filter: string) => {
+      if (filter === '') return true; // Exibir todos se filtro estiver vazio
+      const sexoNumber = +filter; // Converte o filtro para número
+      return data.sexo === sexoNumber;
+    };
+    this.dataSource.filter = sexo.toString(); // Filtra como string, pois o filtro interno trabalha com strings
   }
 
   incluirMembro() {

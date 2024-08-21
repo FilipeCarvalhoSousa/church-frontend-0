@@ -30,10 +30,10 @@
             <input matInput formControlName="telefone" type="number">
           </mat-form-field>
           <mat-form-field>
-            <mat-label>Estado Civil</mat-label>
-            <mat-select formControlName="estado_civil">
-              <mat-option *ngFor="let estado_civil of estadoCivil" [value]="estado_civil.id">{{ estado_civil.value
-                }}</mat-option>
+            <mat-label>Sexo</mat-label>
+            <mat-select (selectionChange)="onSexoChange($event.value)" formControlName="sexo">
+              <mat-option *ngFor="let sexo of sexoList" [value]="sexo.id">
+                {{ sexo.value }}</mat-option>
             </mat-select>
           </mat-form-field>
         </div>
@@ -44,6 +44,13 @@
             <input matInput formControlName="data_nascimento" type="date">
           </mat-form-field>
           <mat-form-field>
+            <mat-label>Estado Civil</mat-label>
+            <mat-select formControlName="estado_civil">
+              <mat-option *ngFor="let estado_civil of estadoCivil" [value]="estado_civil.id">
+                {{ estado_civil.value }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field>
             <mat-label>Data de Casamento</mat-label>
             <input matInput formControlName="data_casamento" type="date">
           </mat-form-field>
@@ -51,11 +58,10 @@
           <mat-form-field>
             <mat-label>Conjuge</mat-label>
             <mat-select formControlName="conjuge">
-              <mat-option *ngFor="let conjuge of conjugeList" [value]="conjuge.id">{{ conjuge.nome
-                }}</mat-option>
+              <mat-option *ngFor="let conjuge of conjugesFiltrados" [value]="conjuge.id">
+                {{ conjuge.nome }}</mat-option>
             </mat-select>
           </mat-form-field>
-
         </div>
 
         <div class="endereco">
@@ -115,19 +121,31 @@
           <div>
             <mat-form-field>
               <mat-label>Departamento</mat-label>
-              <mat-select formControlName="departamento_nome">
-                <mat-option *ngFor="let departamento of departamentoList"
-                            [value]="departamento.nome">
+              <mat-select formControlName="departamento" (selectionChange)="onDepartamentoChange($event.value)">
+                <mat-option *ngFor="let departamento of listaDepartamentos"
+                            [value]="departamento.id">
                   {{ departamento.nome }}
                 </mat-option>
               </mat-select>
             </mat-form-field>
-            <button [disabled]="!departamento_nome.dirty"
+            <mat-form-field>
+              <mat-label>Cargo</mat-label>
+              <mat-select formControlName="cargo" multiple>
+                <mat-option *ngFor="let c of cargosFiltrados"
+                            [value]="c.titulo">
+                  {{ c.titulo }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <button [disabled]="!departamento.dirty"
                     mat-icon-button
                     color="warn"
-                    (click)="adicionarDepartamento()">
+                    (click)="adicionarDepartamento(departamento.value)">
               <mat-icon>add</mat-icon>
             </button>
+          </div>
+          <div>
+
           </div>
         </div>
         <div>
@@ -159,11 +177,35 @@
             </table>
           </div>
           <div class="tabela-auxiliar" *ngIf="departamentoItemList.length">
-            <h3 class="sub-titulo">Departamentos Incluídos</h3>
+            <h3 class="sub-titulo">Departamentos a qual pertence</h3>
             <table mat-table [dataSource]="departamentoItemList" class="mat-elevation-z1">
               <ng-container class="tabela-coluna-filhos" matColumnDef="nome">
                 <th mat-header-cell *matHeaderCellDef> Nome </th>
                 <td mat-cell *matCellDef="let departamento"> {{departamento.nome}} </td>
+              </ng-container>
+              <ng-container matColumnDef="cargos">
+                <th mat-header-cell *matHeaderCellDef> Cargos </th>
+                <td mat-cell *matCellDef="let departamento">
+                  <div *ngIf="departamento.cargos?.length">
+                    <ul>
+                      <li *ngFor="let cargo of departamento.cargos">{{cargo.nome}}</li>
+                    </ul>
+                  </div>
+                  <div *ngIf="!departamento.cargos?.length">
+                    <em>Sem cargos</em>
+                  </div>
+                </td>
+                <!-- <td mat-cell *matCellDef="let departamento" [attr.colspan]="colunasExibicaoDepartamentos.length">
+                  <div *ngIf="departamento.cargos?.length">
+                    <strong>Cargos:</strong>
+                    <ul>
+                      <li *ngFor="let cargo of departamento.cargos">{{cargo.nome}}</li>
+                    </ul>
+                  </div>
+                  <div *ngIf="!departamento.cargos?.length">
+                    <em>Sem cargos</em>
+                  </div>
+                </td> -->
               </ng-container>
               <ng-container matColumnDef="acao">
                 <th mat-header-cell *matHeaderCellDef> Excluir </th>
@@ -173,13 +215,16 @@
                   </button>
                 </td>
               </ng-container>
+
+
               <tr mat-header-row *matHeaderRowDef="colunasExibicaoDepartamentos"></tr>
               <tr mat-row *matRowDef="let row; columns: colunasExibicaoDepartamentos;"></tr>
             </table>
           </div>
         </div>
         <div class="actions">
-          <button class="button-primary" mat-raised-button type="submit" (click)="onSubmit()">Salvar</button>
+          <button *ngIf="!memberId" class="button-primary" mat-raised-button type="submit" (click)="createMembro()">Criar Membro</button>
+          <button *ngIf="memberId" class="button-primary" mat-raised-button type="submit" (click)="editarMembro()">Alterar Membro</button>
           <button class="button-secondary" mat-raised-button type="button" (click)="onCancel()">Cancelar</button>
         </div>
       </mat-card-content>

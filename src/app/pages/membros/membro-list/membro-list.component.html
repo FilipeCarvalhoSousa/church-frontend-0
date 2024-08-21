@@ -1,12 +1,37 @@
-<div style="padding: 2%;" *ngIf="!isEditar">
-  <table mat-table [dataSource]="membros" class="mat-elevation-z8">
+<div style="margin: 1%; text-align: right;">
+  <button mat-fab extended class="button-primary" (click)="incluirMembro()">
+    <mat-icon>people</mat-icon>
+    <span>Novo Membro</span>
+  </button>
+</div>
+<div style="padding: 2%;" *ngIf="dataSource.data.length">
+  <mat-form-field appearance="outline">
+    <mat-label>Filtrar por Sexo</mat-label>
+    <mat-select (selectionChange)="applyFilter($event.value)">
+      <mat-option value="">Todos</mat-option>
+      <mat-option value="1">Masculino</mat-option>
+      <mat-option value="2">Feminino</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8">
     <ng-container matColumnDef="nome">
-      <th mat-header-cell *matHeaderCellDef> Nome </th>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header> Nome </th>
       <td mat-cell *matCellDef="let membro"> {{membro.nome}} </td>
     </ng-container>
     <ng-container matColumnDef="conjuge">
       <th mat-header-cell *matHeaderCellDef> Conjuge </th>
-      <td mat-cell *matCellDef="let membro"> {{membro.conjuge.nome}} </td>
+      <td mat-cell *matCellDef="let membro">
+        <span *ngIf="membro.conjuge; else noConjuge">
+          {{membro.conjuge.nome}}
+        </span>
+        <ng-template #noConjuge>Não possui</ng-template>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="sexo">
+      <th mat-header-cell *matHeaderCellDef> Sexo </th>
+      <td mat-cell *matCellDef="let membro">
+        {{membro.sexo === 1 ? 'Masculino' : membro.sexo === 2 ? 'Feminino' : ''}}
+      </td>
     </ng-container>
     <ng-container matColumnDef="action">
       <th mat-header-cell *matHeaderCellDef style="text-align: center;"> Ações </th>
@@ -22,11 +47,7 @@
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
   </table>
-  <div style="margin: 1%; text-align: right;">
-    <button mat-fab extended class="button-primary" (click)="incluirMembro()">
-      <mat-icon>people</mat-icon>
-      <span>Novo Membro</span>
-    </button>
-  </div>
 </div>
-
+<div class="mensagem" style="padding: 2%;" *ngIf="!dataSource.data.length">
+  <p>Nenhum membro cadastrado ainda. Cadastre um novo membro!</p>
+</div>
