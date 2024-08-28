@@ -1,12 +1,12 @@
-import { MembrosService } from './../../../service/membros.service';
-import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CargoDepartamento, Departamento } from 'src/app/interface/departamento.interface';
 import { Membro } from 'src/app/interface/membro.interface';
 import { DepartamentoService } from 'src/app/service/departamento.service';
 import { UF } from 'src/app/shared/helpers/estados';
 import { ESTADO_CIVIL, SEXO, SITUACAO } from 'src/app/shared/helpers/shared';
+import { MembrosService } from './../../../service/membros.service';
 
 @Component({
   selector: 'app-membro-edicao',
@@ -24,11 +24,11 @@ export class MembroEdicaoComponent implements OnInit {
   listaDepartamentos: Departamento[] = [];
   listaCargos: CargoDepartamento[] = [];
   departamentoItemList: any[] = [];
+  cargoListArmazenado: any[] = [];
   cargosFiltrados: any[] = [];
   departamentoSelecionado!: any;
 
-  cargoList!: any[];
-  cargoListDepartamento!: any[];
+  cargoList!: CargoDepartamento[];
   filhosList: any[] = [];
   filhosItemList!: any[];
 
@@ -37,10 +37,26 @@ export class MembroEdicaoComponent implements OnInit {
 
   membroForm: FormGroup = new FormGroup({
     id: new FormControl('', { validators: [] }),
-    nome: new FormControl('', Validators.required),
+    nome: new FormControl('',
+      [
+        Validators.required,
+        Validators.minLength(3),
+        Validators.maxLength(40),
+      ]
+    ),
     situacao: new FormControl('', Validators.required),
-    email: new FormControl('', [Validators.required, Validators.email]),
-    telefone: new FormControl('', Validators.required),
+    email: new FormControl('',
+      [
+        Validators.required, Validators.email
+      ]
+    ),
+    telefone: new FormControl('',
+      [
+        Validators.required,
+        Validators.minLength(3),
+        Validators.maxLength(40),
+      ]
+    ),
     sexo: new FormControl('', Validators.required),
     endereco_rua: new FormControl('', Validators.required),
     endereco_bairro: new FormControl('', Validators.required),
@@ -48,7 +64,7 @@ export class MembroEdicaoComponent implements OnInit {
     endereco_estado: new FormControl('', Validators.required),
     endereco_pais: new FormControl('', Validators.required),
     departamento: new FormControl('', { validators: [] }),
-    cargo: new FormControl('', Validators.required),
+    cargo: new FormControl('', { validators: [] }),
     data_nascimento: new FormControl('', Validators.required),
     estado_civil: new FormControl('', Validators.required),
     conjuge: new FormControl('', Validators.required),
@@ -165,7 +181,8 @@ export class MembroEdicaoComponent implements OnInit {
   estadoCivil = ESTADO_CIVIL;
 
   colunasExibicaoFilhos: string[] = ['nome', 'telefone', 'email', 'acao'];
-  colunasExibicaoDepartamentos: string[] = ['nome', 'cargos','acao'];
+  colunasExibicaoDepartamentos: string[] = ['nome', 'cargos', 'acao'];
+  cargosColumns: string[] = ['cargos'];
 
   constructor(
     private route: ActivatedRoute,
@@ -203,29 +220,30 @@ export class MembroEdicaoComponent implements OnInit {
 
   resetDepartamento() {
     this.departamento.setValue('');
+    this.cargo.setValue('');
   }
 
-  adicionarDepartamento(depart: number) {
+  adicionarDepartamento(depart: number, cargos: any[]) {
     const departamento = this.departamentoSelecionado = this.listaDepartamentos.find(d => d.id === depart);
 
     if (!departamento) {
       return
     }
-    console.log('d.', departamento);
-
 
     const data = {
       nome: departamento.nome,
-      cargos: this.cargo.value
+      cargos: cargos
     }
-
-    this.cargoListDepartamento = data.cargos
+    this.cargoListArmazenado = cargos
 
     this.departamentoItemList = [...this.departamentoItemList, data]
-    console.log('this.departamentoItemList', this.departamentoItemList);
 
 
     this.resetDepartamento()
+  }
+
+  trackByCargo(index: number): number {
+    return index;
   }
 
   removerDepartamento(departamento: any) {
@@ -278,7 +296,7 @@ export class MembroEdicaoComponent implements OnInit {
         país: 'Brasil',
       },
       departamento: this.departamentoItemList,
-      cargo: this.cargoList,
+      cargo: this.departamentoItemList,
       conjugeId: this.conjuge.value,
       filhos: this.filhosList
     }
@@ -337,7 +355,6 @@ export class MembroEdicaoComponent implements OnInit {
         });
 
         this.departamentoItemList = response.departamento;
-        this.cargoList = response.cargo;
         this.filhosList = response.filhos;
 
         this.selectedSexo = response.sexo; // Define o sexo selecionado
@@ -390,6 +407,8 @@ export class MembroEdicaoComponent implements OnInit {
     this.departamentoSelecionado = this.listaDepartamentos.find(d => d.id === value);
 
     this.cargosFiltrados = this.departamentoSelecionado ? this.departamentoSelecionado.cargos : [];
+    console.log('cargosFiltrados', this.cargosFiltrados);
+
   }
   onSexoChange(sexo: number) {
     if (this.isEditing) {
@@ -410,6 +429,25 @@ export class MembroEdicaoComponent implements OnInit {
     } else {
       this.conjugesFiltrados = [];
     }
+  }
+
+  formatarTelefone(event: any) {
+    const valor = event.target.value;
+    const numeroFormatado = this.formataTelefone(valor);
+    this.membroForm?.get('telefone')?.setValue(numeroFormatado);
+  }
+
+  formataTelefone(numero: string): string {
+    // Remove todos os caracteres não numéricos e espaços
+    const numeroLimpo = numero.replace(/\D/g, '');
+
+    // Verifica se o número tem pelo menos 11 dígitos
+    if (numeroLimpo.length < 12) {
+      return numeroLimpo; // Retorna o número sem formatação se for muito curto
+    }
+    return ''
+
+    // ... restante da função
   }
 
   ngOnInit(): void {

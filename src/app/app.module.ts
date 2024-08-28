@@ -11,9 +11,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatListModule } from '@angular/material/list';
-
-
-
+import { NgxMaskDirective, provideNgxMask } from 'ngx-mask';
 
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
@@ -66,9 +64,10 @@ import { DepartamentoEdicaoComponent } from './pages/departamentos/departamento-
     MatInputModule,
     MatSelectModule,
     ReactiveFormsModule,
-    MatListModule
+    MatListModule,
+    NgxMaskDirective,
   ],
-  providers: [],
+  providers: [provideNgxMask()],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
